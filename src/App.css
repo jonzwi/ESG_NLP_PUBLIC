@@ -1,0 +1,72 @@
+.App {
+  text-align: center;
+  padding: 30px;
+  font-family:'Times New Roman', Times, serif;
+  width: 95vw;
+}
+
+.title {
+  font-size: xx-large;
+}
+
+.filter-wrap{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  width: 90vw;
+  height: 200px;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.filter > .dropdown {
+  margin-left: 30px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
+}
+
+.description {
+  font-size: small;
+  text-align: left;
+}
+
+.result-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  width: 90%;
+}
+
+.section{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 5px;
+}
+
+.box {
+  height: 500px;
+  border: 2px solid black;
+  overflow-y: scroll;
+  width: 30vw;
+}
+
+.inner-box {
+  text-align: left;
+  border: 1px solid black;
+}
