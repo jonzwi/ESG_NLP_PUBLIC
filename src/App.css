@@ -32,11 +32,11 @@
   font-weight: bold;
 }
 
-.red {
+.negative {
   color: red;
 }
 
-.green {
+.positive {
   color: green;
 }
 
@@ -68,5 +68,7 @@
 
 .inner-box {
   text-align: left;
-  border: 1px solid black;
+  border-bottom: 1px solid black;
+  display: flex;
+  flex-wrap: wrap;
 }

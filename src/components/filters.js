@@ -1,90 +1,53 @@
-import Dropdown from 'react-dropdown';
 import '../App.css';
-import 'react-dropdown/style.css'
-import { useState } from 'react';
+import 'react-dropdown/style.css';
+
+import Dropdown from 'react-dropdown';
+import { useRef } from 'react';
 
 
-function Filters ({setState, ...rest}) {
+function Filters ({setState, options, abbrevDict}) {
 
-    const companyOptions = ["Nvidia", "Amazon", "Bloom Energy"];
-    const topicOptions = ["10K", "10Q", "Litigation DB"];
-    const relevancyOptions = ["70%", "75%", "80%", "85%", "90%", "95%"];
-    
-    const query = {
-        'company': '',
-        'topic': '',
-        'rel': ''
-    }
-    const [locQueryState, setLocQueryState] = useState(query);
+    const companyRef = useRef();
+    const topicRef = useRef();
 
-    const companyAbbreviations = {
-        "Amazon" : "AMZN",
-        "Nvidia" : "NVDA",
-        "Bloom Energy" : "BE",
-        "SCHN": "SCHN"
-    }
-
-    
     /**
-     * Handles value changes of the dropdown menus
-     * 
-     * @param {number} src 
-     * @param {event} ev 
+     * Sets parent ref value when update button is pressed
      */
-    const handleSelect = (src, ev) => {
-        switch (src){
-            case "company": 
-                locQueryState.company = companyAbbreviations[ev.value];
-                break;
-            case "topic": 
-                locQueryState.topic = ev.value;
-                break;
-            case "rel":
-                locQueryState.rel = ev.value;
-                break;
-            default:
-                break;
+    const onSubmit = (e) => {
+        e.preventDefault();
+        const currentCompany = companyRef.current.state.selected.value;
+        const currentTopic = topicRef.current.state.selected.value;
+        if(!currentCompany || !currentTopic) {
+            alert("Please select all filters");
+            return;
         }
+        setState(Object.create({
+            company: abbrevDict[currentCompany],
+            topic: currentTopic
+        }));
     };
-
-    /**
-     * Sets parent state query when update button is pressed
-     */
-    const handleSubmit = () => {
-        setState(Object.create(locQueryState))
-    }
 
     return (
         <div className="filter-wrap">
             <div className="filter">
                 Company:
                 <Dropdown className="dropdown"
-                    options={companyOptions} 
-                    onChange={(ev) => handleSelect("company", ev)}
+                    options={options.company} 
+                    ref={companyRef}
                     placeholder="Select the company" 
                 />
             </div>
             <div className="filter">
                 Topics:
                 <Dropdown className="dropdown"
-                    options={topicOptions} 
-                    onChange={(ev) => handleSelect("topic", ev)} 
+                    options={options.topic} 
+                    ref={topicRef}
                     placeholder="Select the source" 
                 />
             </div>
-            <button onClick={() => handleSubmit()}>Update</button>
+            <button onClick={onSubmit}>Update</button>
         </div>
-    )
+    );
 };
 
 export default Filters;
-/*
- <div className="filter">
-                Relevancy:
-                <Dropdown className="dropdown"
-                    options={relevancyOptions} 
-                    onChange={(ev) => handleSelect("rel", ev)} 
-                    placeholder="Select the relevancy percentile" 
-                />
-            </div>
-*/
