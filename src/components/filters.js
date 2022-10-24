@@ -14,7 +14,7 @@ function Filters ({setState, options, abbrevDict}) {
      * Sets parent ref value when update button is pressed
      */
     const onSubmit = (e) => {
-        e.preventDefault();
+       // e.preventDefault();
         const currentCompany = companyRef.current.state.selected.value;
         const currentTopic = topicRef.current.state.selected.value;
         if(!currentCompany || !currentTopic) {

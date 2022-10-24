@@ -71,4 +71,5 @@
   border-bottom: 1px solid black;
   display: flex;
   flex-wrap: wrap;
+  padding: 3px;
 }

@@ -7,13 +7,24 @@ import Results from './components/results';
 
 function App() {
 
-  const [filterState, setFilterState] = useState({})
+  const [filterState, setFilterState] = useState({
+    company: undefined,
+    topic: undefined
+  })
 
+
+  /**
+   * Options for dropdowns
+   */
   const filterOptions = {
     company: ["Nvidia", "Bloom Energy"],
     topic: ["10K", "10Q", "Litigation DB"]
   };
 
+  /**
+   * Use to convert full company name from dropdown to 
+   * abbreviation used in file naming.
+   */
   const companyAbbreviations = {
     "Amazon" : "AMZN",
     "Nvidia" : "NVDA",
@@ -27,7 +38,7 @@ function App() {
       <Filters setState={setFilterState} options={filterOptions} abbrevDict={companyAbbreviations}/>
       <div className="description">
         <span className="bold">Bold</span> sentences are most relevant to the category. 
-        * The number in "r.number" shows relevancy to the topic (1 being most relevant).
+        * The number in [r.number] shows relevancy to the topic (1 being most relevant).
         * <span className='red'>Red: ESG risk </span> 
         * <span className='green'>Green: ESG mitigation </span> 
         * Black: Relevant to ESG but no direction regarding ESG risks/mitigation.
