@@ -1,29 +1,36 @@
 import '../App.css';
 
 import { useEffect, useState } from 'react';
+import ReactWordcloud from 'react-wordcloud';
+
+
 import Papa from 'papaparse';
 import parse from "html-react-parser";
 
-
 /* TODO: 
 
-    -Arabesque msci random vals
-
-    -maybe order by sentiment
+    -Arabesque msci random vals - APIS, columbia U litigation DB
 
 
     Feature List:
-    - N top results, 3, 5, 10, 15, 20
     - Compare to other ESG Scores
+
+
+    option to sort results max score or top by sentiment & top n
+
+    maybe check boxes
+
+    EEL
 */
 
-function Results ({filterState, ...rest}) {
+function Results ({filterState, abbrevDict, ...rest}) {
 
     const TOPN = 5;
     const columnToDecideSentiment = "vote_balanced";
     const columnToRenderParagraph = "FORMATTED"; //must be used for bolding
 
     const [resultState, setResultState] = useState({});
+    const [sortBy, setSortBy] = useState("")
 
 
     /**
@@ -109,18 +116,14 @@ function Results ({filterState, ...rest}) {
      */
     useEffect(() => {
         if(!filterState.company) return;
+        if(!filterState.source.length) {
+            setResultState(Object.create({}));
+            return;
+        }
 
-        /**
-         * @param {Object} param 
-         * @returns string prefix of url to query csv
-         */
-        const formatURL = (param) =>  `../Formatted_Threshold/formatted_${param.company}_${param.topic}`;
+        const formatURL = (param) =>  
+            `../Formatted_Threshold/formatted_${abbrevDict[param.company]}_${param.source[0]}`;
 
-        /**
-         * Handles fetching csv file data and reading contents
-         * @param {string} url 
-         * @returns Promise with csv data
-         */
         const fetchCsv = async(url) => await (await fetch(url)).text();
         const getCsvData = async(url) => Papa.parse(
             await fetchCsv(url), 
@@ -132,9 +135,25 @@ function Results ({filterState, ...rest}) {
 
         const formatData = (df) => selectTopNBySentiment(TOPN, calculateOverallSentiment(df));
         const fetchData = async(segment) => await getCsvData(`${urlPrefix}_${segment}.csv`);
-        
+
+        const fetchAllSourceData = (segment) => {
+            return filterState.source.map(async(src) => {
+                const url  = `../Formatted_Threshold/formatted_${abbrevDict[filterState.company]}_${src}_${segment}.csv`;
+                return await getCsvData(url);
+            });
+        };
+
+
+        // Promise.all([fetchAllSourceData('E'), fetchAllSourceData('S'), fetchAllSourceData('G')])
+        //     .then(results => {
+        //         results = results.map(sectionResults => {
+        //             return sectionResults.map(srcResult => {
+        //                 return srcResult.then(data => console.log(data.data))
+        //             })
+        //         })
+        //     });
         Promise.all([fetchData('E'), fetchData('S'), fetchData('G')])
-            .then(results => {
+        .then(results => {
                 //results = results.map(result => formatData(result.data));
                 results = results.map(result => result.data)
                 const headers = createHeaderMap(results[0]);
@@ -147,18 +166,35 @@ function Results ({filterState, ...rest}) {
             });
     }, [filterState]);
 
-
     /**
      * Removes non-breaking spaces from each paragraph to get rid of poor formatting
      * @param {string} str 
      * @returns well formatted string
      */
-    const replaceNonBreakingSpaces = (str) => str
-        .split("")
+    const replaceNonBreakingSpaces = (str) => {
+        return str.split("")
         .map(ch => ch.charCodeAt(0)===160 ? " " : ch)
         .join("");
+    }
 
     const getColumnIndx = (col) => resultState.headers.get(col)
+
+    /**
+     * Sorts input array by selected sentiment column
+     * @param {arr} arr 
+     * @returns sorted array
+     */
+    const sortedParagraphs = (arr) => {
+        let valMapping = {}
+        if(sortBy==="score") {
+            return arr.sort((a, b) => b[getColumnIndx("MATCH_SCORE")] - a[getColumnIndx("MATCH_SCORE")])
+        }
+        else if(sortBy==="sentNeg") valMapping = { "negative": 2, "positive": 1, "neutral": 0 }
+        else if(sortBy==="sentPos") valMapping = { "positive": 2, "negative": 1, "neutral": 0 }
+        return arr.sort((a, b) => 
+            valMapping[b[getColumnIndx(columnToDecideSentiment)]] - 
+            valMapping[a[getColumnIndx(columnToDecideSentiment)]])
+    }
     
     /**
      * 
@@ -167,44 +203,121 @@ function Results ({filterState, ...rest}) {
      */
     const ParagraphComponent = (props) => {
         let inputData = props.param;
-        if(!inputData) return <></>;
-        return inputData.map((line, id) => {
-            if(id===0) return <div key={id}></div>
-            const sentimentClass = line[getColumnIndx(columnToDecideSentiment)] || "";
-            let lineToRender = line[getColumnIndx(columnToRenderParagraph)] || "";
-            lineToRender = replaceNonBreakingSpaces(lineToRender)
-            return ( 
-                <div className={`inner-box ${sentimentClass}`} 
-                key={id}>
-                    {parse(lineToRender)}
-                </div>
-            );
+        if(!inputData) return <div></div>;
+        if(inputData[1].length<=1) return <div>No relevant results with these settings</div>
+        const testObjs = (html) => {
+            return parse(html)
+        }
+
+        const sentimentCount = {
+            "positive": 1,
+            "negative": 1,
+            "neutral": 1
+        }
+
+        const findMissingSentiments = (data) => {
+            const count = { "positive": 0, "negative": 0, "neutral": 0 }
+            data.map((line) => {
+                const sentiment = line[getColumnIndx(columnToDecideSentiment)]
+                if(count[sentiment]>=0) count[sentiment]++;
+                return line;
+            })
+            const insertCol = getColumnIndx(columnToRenderParagraph);
+            const sentimentCol = getColumnIndx(columnToDecideSentiment)
+            Object.entries(count).map(([sent, cnt]) => {
+                if(cnt===0){
+                    let row = [];
+                    row[insertCol] = `No ${sent} sentiment results.`;
+                    row[sentimentCol] = `${sent}`;
+                    row[getColumnIndx("MATCH_SCORE")] = 0;
+                    data.push(row);
+                }
+                return [sent, cnt];
+            })
+        }
+
+        findMissingSentiments(inputData)
+        return sortedParagraphs(inputData).map((line, id) => {
+            if(id===0 || line.length<=1) return <div key={id}></div>
+
+            const sentimentClass = line[getColumnIndx(columnToDecideSentiment)];
+            let lineToRender = line[getColumnIndx(columnToRenderParagraph)];
+            lineToRender = replaceNonBreakingSpaces(lineToRender);
+            const sentOrder = sentimentCount[sentimentClass]++;
+            if(line[1]){
+                return ( 
+                    <div className={`inner-box ${sentimentClass}`} 
+                    key={id}>
+                        <div className="p-head">{sentOrder}. {sentimentClass}</div>
+                        {testObjs(lineToRender)}
+                    </div>
+                );
+            }
+            return <div key={id} className="inner-box center">{lineToRender}</div>
         });
     };
 
+    const words = [
+        {
+          text: 'ESG',
+          value: 45,
+        },
+        {
+          text: 'NLP',
+          value: 35,
+        },
+        {
+          text: 'Capgemini',
+          value: 50,
+        },
+        {
+          text: 'Project',
+          value: 30,
+        },
+      ]
+       
+      function SimpleWordcloud() {
+        return <ReactWordcloud
+                words={words} 
+                options={{rotations:0}}
+                size={[400,400]}/>
+      }
+
+
+
     return (
-        <div className='result-wrapper'>
-            <div className='section'>
-                <h4>Environment</h4>
-                <span> MSCI: 82.13 | Arabesque: 76.97</span>
-                <div className='box'>
-                    <ParagraphComponent param={resultState.environment}/>
+        <div>
+            <div className="filter right">
+                Sort by
+                <form>
+                    <select onChange={(e) => setSortBy(e.target.value)}>
+                        <option value="score">Relevance</option>
+                        <option value="sentNeg">Negative, Relevance</option>
+                        <option value="sentPos">Positive, Relevance</option>
+                    </select>
+                </form>
+            </div>
+            <div className='result-wrapper'>
+                <div className='section'>
+                    <h4>Environment</h4>
+                    <div className='box'>
+                        <ParagraphComponent param={resultState.environment}/>
+                    </div>
+                </div>
+                <div className='section'>
+                    <h4>Social</h4>
+                    <div className='box'>
+                        <ParagraphComponent param={resultState.social}/>
+                    </div>
+                </div>
+                <div className='section'>
+                    <h4>Governance</h4>
+                    <div className='box'>
+                        <ParagraphComponent param={resultState.governance}/>
+                    </div>
                 </div>
             </div>
-            <div className='section'>
-                <h4>Social</h4>
-                <span> MSCI: 75.33 | Arabesque: 76.08</span>
-                <div className='box'>
-                    <ParagraphComponent param={resultState.social}/>
-                </div>
-            </div>
-            <div className='section'>
-                <h4>Governance</h4>
-                <span> MSCI: 54.34 | Arabesque: 63.86</span>
-                <div className='box'>
-                    <ParagraphComponent param={resultState.governance}/>
-                </div>
-            </div>
+            <SimpleWordcloud/>
         </div>
     );
 };
