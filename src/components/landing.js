@@ -1,7 +1,8 @@
 import '../App.css';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import Select from 'react-select';
+
 import { Buffer } from 'buffer';
 
 function LandingPage({params}) {
@@ -13,18 +14,12 @@ function LandingPage({params}) {
     const [selectedOption, setSelectedOption] = useState(undefined);
     const [showApiResults, setShowApiResults] = useState(0);
 
-
-    const handleChange = (e) => {
-        const update = e.target.value;
-        let newStateObj = params.appState;
-        newStateObj.company = update;
-        newStateObj.topic = []
-        params.appSetState(Object.create(newStateObj));
-    }
-
     const handleNav = () => {
-        console.log("NAV")
-        params.appNav(0);
+        let newStateObj = params.appState;
+        newStateObj.company = selectedOption;
+        newStateObj.source = []
+        params.appSetState(Object.create(newStateObj));
+        params.setScreen('topN');
     }
 
 
@@ -37,18 +32,25 @@ function LandingPage({params}) {
     },[])
 
     const onChange = (value, action) => {
-        setSelectedOption(Object.create(value));
-        if(action.action==='select-option') setShowApiResults(1);
-        else if(action.action==='clear') setShowApiResults(0);
+        if(action.action==='select-option') {
+            setSelectedOption(Object.create(value));
+            setShowApiResults(1);
+        }
+        else if(action.action==='clear') {
+            setSelectedOption(undefined);
+            setShowApiResults(0);
+        }
     }
 
     const SelectComponent = () => {
         return <Select  className="l-dropdown"
-                        options={params.landingOptions} 
+                        options={params.options.company} 
                         isSearchable={true}
                         isClearable={showApiResults}
                         onChange={onChange}
-                        defaultValue={selectedOption}/>
+                        defaultValue={selectedOption}
+                        placeholder="Select Company..."
+                />
     }
 
     return (
@@ -62,7 +64,7 @@ function LandingPage({params}) {
                     <div className={showApiResults ? "text-landing showApi show" : "text-landing noShowApi hide"}>
                         <div className='fadeIn'>MSCI Score: {(Math.random()*100).toFixed(2)}</div>
                         <div className='fadeIn'>Arabesque Score: {(Math.random()*100).toFixed(2)}</div>
-                        <div className="btn shadow fadeIn" onClick={handleNav}>NLP Deep Dive</div>
+                        <div className="btn-landing shadow fadeIn" onClick={handleNav}>NLP Deep Dive</div>
                     </div>
                 :   <div className={showApiResults ? "text-landing noShowApi show" : "text-landing showApi hide"}/>
                 }

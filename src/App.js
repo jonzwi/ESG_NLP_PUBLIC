@@ -5,6 +5,8 @@ import { useState } from 'react';
 import Filters from './components/filters';
 import Results from './components/results';
 import LandingPage from './components/landing';
+import TopNResults from './components/topnresults';
+
 
 function App() {
 
@@ -13,22 +15,15 @@ function App() {
     source: []
   });
 
-  const [landingScreen, setLandingScreen] = useState(1)
-
+  const [showScreen, setShowScreen] = useState("landing")
 
   /**
    * Options for dropdowns
    */
-  const filterOptions = {
-    company: ["Select company", "Nvidia", "Bloom Energy"],
-    source: ["10K", "10Q", "Litigation DB"]
-  };
-
-  const landingOptions = [
+  const companyOptions = [
     { value: 'BE', label: 'Bloom Energy | BE' },
-    { value: 'AMZN', label: 'Amazon | AMZN' },
     { value: 'CNP', label: 'CenterPoint Energy, Inc. | CNP' },
-    { value: 'CBP', label: 'Campbell Soup Company | CBP' },
+    { value: 'CPB', label: 'Campbell Soup Company | CPB' },
     { value: 'CTAS', label: 'Cintas Corporation | CTAS' },
     { value: '3M', label: '3M Company | 3M' },
     { value: 'AMD', label: 'Advanced Micro Devices, Inc. | AMD' },
@@ -41,42 +36,35 @@ function App() {
     { value: 'NVDA', label: 'Nvidia | NVDA' },
   ].sort((a, b) => a.value.localeCompare(b.value));
 
+  const sourceOptions = [
+    { value: "10K", label: "10K" },
+    { value: "10Q", label: "10Q" },
+    { value: "LitigationDB", label: "Litigation DB"}
+  ]
+
+  const filterOptions = {
+    company: companyOptions,
+    source: sourceOptions
+  };
+
 
   /**
    * Use to convert full company name from dropdown to 
    * abbreviation used in file naming.
    */
-  const companyAbbreviations = {
-    "Amazon" : "AMZN",
-    "Nvidia" : "NVDA",
-    "Bloom Energy" : "BE",
-    "SCHN": "SCHN"
-  };
 
   const params = {
     appState: filterState,
     appSetState: setFilterState,
-    appNav: setLandingScreen,
-    filterOptions: filterOptions,
-    abbrevDict: companyAbbreviations,
-    landingOptions: landingOptions
+    setScreen: setShowScreen,
+    options: filterOptions
   }
 
-  return (
-    <div className="App">
-      { landingScreen ? 
-      <LandingPage params={params}/>
-      : 
-      <div>
-        <Filters  
-          nav={setLandingScreen} 
-          state={filterState}
-          setState={setFilterState} 
-          options={filterOptions}
-        />
+  const detailComponent = (
+    <div className="detail-page fadeIn">
+        <Filters params={params}/>
         <Results  
           filterState={filterState} 
-          abbrevDict={companyAbbreviations}
         />
         <div className="description">
           <span className="bold">Bold</span> sentences are most relevant to the category. 
@@ -85,7 +73,18 @@ function App() {
           * <span className='positive'>Green: ESG mitigation </span> 
           * Black: Relevant to ESG but no direction regarding ESG risks/mitigation.
         </div>
-      </div> }
+      </div>
+  )
+
+  const allComponents = {
+    'landing': <LandingPage params={params}/>,
+    'topN': <TopNResults params={params}/>,
+    'detail': detailComponent
+  }
+
+  return (
+    <div className="App">
+      {allComponents[showScreen]}
     </div>
   );
 }

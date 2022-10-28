@@ -1,74 +1,84 @@
 import '../App.css';
-//import 'react-dropdown/style.css';
 
-//import Dropdown from 'react-dropdown';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 
 
-function Filters ({nav, state, setState, options}) {
+function Filters ({params}) {
 
-    const companyRef = useRef();
-    const sourceRef = useRef();
+    // useEffect(() => {
+    //     window.location.reload();
+    // }, [])
 
-    const refList = new Array(options.source.length)
-        .fill()
-        .map(id => new useRef())
-
+    const [selectedCompany, setSelectedCompany] = useState(params.appState.company);
+    const [selectedSources, setSelectedSources] = useState([])
+    
     /**
      * Sets parent ref value when update button is pressed
      */
-    const onChange = (e) => {
-       // e.preventDefault();
-        const checkedBoxes = refList.map(ref => {
-            if(ref.current.checked===true) return ref.current.name
-        }).filter(name => name);
-        const currentCompany = companyRef.current.value;
-        const currentSource = checkedBoxes;
-        if(!currentCompany || !currentSource) {
+    const onSubmit = (e) => {
+        
+        if(!selectedCompany || !selectedSources.length) {
             alert("Please select all filters");
             return;
         }
-        setState(Object.create({
-            company: currentCompany,
-            source: currentSource
+        params.appSetState(Object.create({
+            company: selectedCompany.value,
+            source: selectedSources.map(src => src.value)
         }));
     };
 
+    const onChangeCompany = (value, action) => {
+        if(action.action==='select-option') {
+            setSelectedCompany(Object.create(value));
+        }
+        else if(action.action==='clear') {
+            setSelectedCompany(undefined);
+        }
+    }
+
+    const onChangeSoure = (value, action) => {
+        setSelectedSources(Array.from(value))
+       
+    } 
+
+    const SelectCompany = () => {
+        return <Select className="filter-dropdown"
+                options={params.options.company} 
+                isSearchable={true}
+                isClearable={selectedCompany!==null}
+                onChange={onChangeCompany}
+                defaultValue={selectedCompany}
+                placeholder="Select company..."
+                />
+    }
+
+    const SelectSources = () => {
+        return <Select className="filter-dropdown"
+                options={params.options.source} 
+                isSearchable={true}
+                onChange={onChangeSoure}
+                defaultValue={selectedSources}
+                placeholder="Select source(s)..."
+                isMulti={true}
+                components={makeAnimated()}
+                />
+    }
+
+
     return (
         <div>
-            <h2>ESG Related Insights</h2>
-            <div className='link' onClick={() => nav(1)}>Back</div>
+            <div className="detail-title">ESG Related Insights</div>
             <div className="filter-wrap">
-                <div className="filter">
-                    Company:
-                    <form>
-                        <select ref={companyRef} 
-                        defaultValue={state.company} 
-                        onChange={onChange}>
-                        {options.company.map((company, idx) => (
-                            <option value={company} key={idx}>{company}</option>
-                        ))}
-                        </select>
-                    </form>
-                </div>
-                <div className="filter">
-                    Source:
-                    <form>
-                    {options.source.map((src, idx) => {
-                        return (
-                            <label key={idx}>
-                                <input
-                                    ref={refList[idx]}
-                                    type="checkbox"
-                                    name={src}
-                                    value={src}
-                                    onChange={onChange}
-                                />
-                                {src}
-                            </label>
-                        )
-                    })}
-                    </form>
+                <div className="selectables">
+                    <div className="filter">
+                        <SelectCompany/>
+                    </div>
+                    <div className='filter'>
+                        <SelectSources/>
+                    </div>
+                    <div className=" btn-filter" onClick={onSubmit}>Show Detailed Results</div>
                 </div>
             </div>
         </div>
@@ -79,21 +89,27 @@ export default Filters;
 
 /*
 
+            <div className='link' onClick={() => params.nav(1)}>Back</div>
+
+
             <div className="filter">
-                Company:
-                <Dropdown className="dropdown"
-                    options={options.company} 
-                    ref={companyRef}
-                    placeholder="Select the company" 
-                />
-            </div>
-            <div className="filter">
-                Source:
-                <Dropdown className="dropdown"
-                    options={options.source} 
-                    ref={sourceRef}
-                    placeholder="Select the source" 
-                />
-            </div>
+                            Source:
+                            <form>
+                            {params.options.source.map((src, idx) => {
+                                return (
+                                    <label key={idx}>
+                                        <input
+                                            disabled={src==="Litigation DB"}
+                                            ref={refList[idx]}
+                                            type="checkbox"
+                                            name={src}
+                                            value={src}
+                                        />
+                                        {src}
+                                    </label>
+                                )
+                            })}
+                            </form>
+                        </div>
 
 */

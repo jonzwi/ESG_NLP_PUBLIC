@@ -21,7 +21,7 @@ import os
 # URL_S = '/content/sample_data/formatted_NVDA_10K_S.csv'
 # URL_G = '/content/sample_data/formatted_NVDA_10K_G.csv'
 
-company = "BE"
+company = "3M"
 
 URL_E = "public/Formatted_Data/formatted_{}_10K_E.csv".format(company)
 URL_S = "public/Formatted_Data/formatted_{}_10K_S.csv".format(company)
@@ -263,9 +263,9 @@ def main(LIST_URLS, topN=50):
 
   ### ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
   
-#   E,S,G = main(
-#         LIST_URLS = [URL_E,URL_S,URL_G],
-#         topN = 100
-#       )
+  E,S,G = main(
+        LIST_URLS = [URL_E,URL_S,URL_G],
+        topN = 50
+      )
