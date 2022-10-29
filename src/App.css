@@ -1,11 +1,10 @@
 Body {
   background-color: var(--landing-color);
-  font-family: 'Ubuntu';
   color: var(--slide-background);
 }
 
 :root {
-  --landing-color: #f0f0f0;
+  --landing-color: #f6f6f6;
   --slide-background: #292835;
   --slide-lighter: #4B4A59;
   --slide-darker: #181724;
@@ -16,13 +15,18 @@ Body {
 
 .App {
   text-align: center;
-  font-family: 'Ubuntu';
+  font-family:Arial, Helvetica, sans-serif;
   height: 100vh;
   width: 100%;
 }
 
 .title {
   font-size: xx-large;
+}
+
+.link {
+  text-decoration: none;
+  color: var(--landing-color)
 }
 
 .filter-wrap{
@@ -74,6 +78,7 @@ Body {
 
 .landing-text{
   width: 100%;
+  font-family: 'Ubuntu';
 }
 
 .l-title{
@@ -96,26 +101,75 @@ Body {
 .l-dropdown {
   padding-top: 10%;
   width: 60%;
-  min-width: 150px;
+  min-width: 250px;
   max-width: 400px;
   color: #444444;
   transition: width .5s ease-in;
 }
 
-@media (width<850px) {
-  .detail-title{
-    height: 50px;
-    /*NEED TO FIX*/
-  }
-}
-.detail-title {
+.detail-title, .topn-title {
   background-image: url('../public/images/capgemini-logo.png');
   background-repeat: no-repeat;
   background-position: center left;
   background-size: 200px;
   font-size: 2.5em;
   padding-bottom: 15px;
-  border-bottom: 1px solid lightgray;
+  border-bottom: 2px solid lightgray;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@media (width<1000px) {
+  .detail-title, .topn-title {
+    background-image: url('../public/images/Capgemini-Emblem.png');
+    background-size: 100px;
+  }
+}
+
+.topn-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.topn-title{
+  font-size: 2em;
+}
+
+.topn-subtitle{
+  font-size: 18px;
+}
+
+.topn-result {
+  width: 80%;
+  padding: 30px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.topn-result + .topn-result{
+  border-top: 1px solid lightgrey;
+}
+
+.topn-desc{
+  width: 25%;
+}
+
+.topn-p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 10px 10px 20px;
+  width: 75%;
+  height: 100px;
+}
+
+.topn-desc + .topn-p {
+  border-left: 1px solid grey;
 }
 
 .filter-dropdown {
@@ -237,22 +291,7 @@ Body {
   border-bottom: 1px solid black;
   display: flex;
   flex-wrap: wrap;
-  padding: 3px;
-}
-
-option, select {
-  cursor: pointer;
-  font-size: 1em;
-  font-weight: lighter;
-  text-align: center;
-  margin-left: 30px;
-  border: 1px solid lightgrey;
   padding: 5px;
-  border-radius: 5px;
-}
-
-select:focus{
-  outline: 2px solid blue;
 }
 
 .sort {
@@ -266,6 +305,7 @@ select:focus{
 .p-head{
   width: 100%;
   border-bottom: 1px solid lightgrey;
+  margin-bottom: 5px;
 }
 
 .simple-cloud {

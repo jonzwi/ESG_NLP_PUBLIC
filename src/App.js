@@ -1,22 +1,17 @@
 import './App.css';
 
-import { useState } from 'react';
-
+import { 
+  BrowserRouter,
+  Routes,
+  Route
+} from 'react-router-dom';
+ 
 import Filters from './components/filters';
 import Results from './components/results';
 import LandingPage from './components/landing';
 import TopNResults from './components/topnresults';
 
-
 function App() {
-
-  const [filterState, setFilterState] = useState({
-    company: undefined,
-    source: []
-  });
-
-  const [showScreen, setShowScreen] = useState("landing")
-
   /**
    * Options for dropdowns
    */
@@ -47,44 +42,79 @@ function App() {
     source: sourceOptions
   };
 
+  const filterPageCustomStyles = {
+    control: (base, state) => ({
+      ...base,
+      boxShadow: "none",
+      outline: "none",
+      border: "none",
+      borderBottom: state.isFocused ? "2px solid var(--cap-primary-color)" 
+        : "1px solid black",
+      backgroundColor: "transparent",
+      borderRadius: "none",
+      textAlign: "left"
+    }),
+    menu: (base, state) => ({
+      ...base,
+      backgroundColor: '#f0f0f0',
+      width: "max-content"
+    }),
+    dropdownIndicator: (base, state) => ({
+      ...base,
+    }),
+    option: (base, state) => ({
+      ...base,
+    }),
+    indicatorSeparator: (base, state) => ({
+      ...base,
+      display: "none"
+    })
+  };
 
-  /**
-   * Use to convert full company name from dropdown to 
-   * abbreviation used in file naming.
-   */
+  const landingPageCustomStyles = {
+    control: (base, state) => ({
+      ...base,
+      boxShadow: "none",
+      outline: "none",
+      border: "none",
+      borderBottom: state.isFocused ? "2px solid var(--cap-primary-color)" 
+        : "1px solid black",
+      backgroundColor: "transparent",
+      borderRadius: "none",
+      textAlign: "left"
+    }),
+    menu: (base, state) => ({
+      ...base,
+      backgroundColor: '#f0f0f0',
+      width: "max-content"
+
+    }),
+    dropdownIndicator: (base, state) => ({
+      ...base,
+    }),
+    option: (base, state) => ({
+      ...base,
+    })
+  };
+
+
+  //React Router
 
   const params = {
-    appState: filterState,
-    appSetState: setFilterState,
-    setScreen: setShowScreen,
-    options: filterOptions
-  }
-
-  const detailComponent = (
-    <div className="detail-page fadeIn">
-        <Filters params={params}/>
-        <Results  
-          filterState={filterState} 
-        />
-        <div className="description">
-          <span className="bold">Bold</span> sentences are most relevant to the category. 
-          * The number in [r.number] shows relevancy to the topic (1 being most relevant).
-          * <span className='negative'>Red: ESG risk </span> 
-          * <span className='positive'>Green: ESG mitigation </span> 
-          * Black: Relevant to ESG but no direction regarding ESG risks/mitigation.
-        </div>
-      </div>
-  )
-
-  const allComponents = {
-    'landing': <LandingPage params={params}/>,
-    'topN': <TopNResults params={params}/>,
-    'detail': detailComponent
+    options: filterOptions,
+    customFilterStyle: filterPageCustomStyles,
+    //customLandingStyle: landingPageCustomStyles
   }
 
   return (
     <div className="App">
-      {allComponents[showScreen]}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingPage params={params}/>}/>
+          <Route path="/topresults/:companyName" element={<TopNResults params={params}/>}/>
+          <Route path="/details/:companyName/:src" element={<Filters params={params}/>}/>
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }

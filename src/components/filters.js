@@ -1,33 +1,27 @@
 import '../App.css';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Select from 'react-select';
-import makeAnimated from 'react-select/animated';
+import { useParams, Link } from 'react-router-dom';
+
+import Results from './results';
 
 
 function Filters ({params}) {
 
-    // useEffect(() => {
-    //     window.location.reload();
-    // }, [])
+    const companyParam = useParams().companyName;
+    const srcParam = useParams().src;
 
-    const [selectedCompany, setSelectedCompany] = useState(params.appState.company);
-    const [selectedSources, setSelectedSources] = useState([])
+    const sourceObject = params.options.source.filter(src => 
+        src.value===srcParam)
+
+    const companyObject = params.options.company.filter(cmp => 
+        cmp.value===companyParam);
+
+
+    const [selectedCompany, setSelectedCompany] = useState(companyObject);
+    const [selectedSources, setSelectedSources] = useState(sourceObject)
     
-    /**
-     * Sets parent ref value when update button is pressed
-     */
-    const onSubmit = (e) => {
-        
-        if(!selectedCompany || !selectedSources.length) {
-            alert("Please select all filters");
-            return;
-        }
-        params.appSetState(Object.create({
-            company: selectedCompany.value,
-            source: selectedSources.map(src => src.value)
-        }));
-    };
 
     const onChangeCompany = (value, action) => {
         if(action.action==='select-option') {
@@ -35,22 +29,20 @@ function Filters ({params}) {
         }
         else if(action.action==='clear') {
             setSelectedCompany(undefined);
-        }
-    }
+        };
+    };
 
-    const onChangeSoure = (value, action) => {
-        setSelectedSources(Array.from(value))
-       
-    } 
+    const onChangeSoure = (value, action) => setSelectedSources(Object.create(value));
 
     const SelectCompany = () => {
         return <Select className="filter-dropdown"
                 options={params.options.company} 
                 isSearchable={true}
-                isClearable={selectedCompany!==null}
+                isClearable={false}
                 onChange={onChangeCompany}
                 defaultValue={selectedCompany}
                 placeholder="Select company..."
+                styles={params.customFilterStyle}
                 />
     }
 
@@ -60,16 +52,15 @@ function Filters ({params}) {
                 isSearchable={true}
                 onChange={onChangeSoure}
                 defaultValue={selectedSources}
-                placeholder="Select source(s)..."
-                isMulti={true}
-                components={makeAnimated()}
+                placeholder="Select source..."
+                styles={params.customFilterStyle}
                 />
-    }
+    };
 
 
     return (
-        <div>
-            <div className="detail-title">ESG Related Insights</div>
+        <div className="detail-page fadeIn">
+            <div className="detail-title">Detailed ESG Related Insights</div>
             <div className="filter-wrap">
                 <div className="selectables">
                     <div className="filter">
@@ -78,38 +69,14 @@ function Filters ({params}) {
                     <div className='filter'>
                         <SelectSources/>
                     </div>
-                    <div className=" btn-filter" onClick={onSubmit}>Show Detailed Results</div>
+                    <Link to={`../details/${selectedCompany.value || companyParam}/${selectedSources.value}`} className="link">
+                        <div className=" btn-filter">Show Detailed Results</div>
+                    </Link>
                 </div>
             </div>
+            <Results params={params}/>
         </div>
     );
 };
 
 export default Filters;
-
-/*
-
-            <div className='link' onClick={() => params.nav(1)}>Back</div>
-
-
-            <div className="filter">
-                            Source:
-                            <form>
-                            {params.options.source.map((src, idx) => {
-                                return (
-                                    <label key={idx}>
-                                        <input
-                                            disabled={src==="Litigation DB"}
-                                            ref={refList[idx]}
-                                            type="checkbox"
-                                            name={src}
-                                            value={src}
-                                        />
-                                        {src}
-                                    </label>
-                                )
-                            })}
-                            </form>
-                        </div>
-
-*/

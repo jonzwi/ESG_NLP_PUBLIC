@@ -3,19 +3,27 @@ import '../App.css';
 import { useEffect, useState } from 'react';
 import Select from 'react-select';
 
-
 import ParagraphComponent from './paragraph';
 
 import Papa from 'papaparse';
+import { useParams } from 'react-router-dom';
 
-function Results ({filterState, ...rest}) {
+function Results ({params}) {
 
-    const TOPN = 5;
+    const company = useParams().companyName;
+    const source = useParams().src;
+
+    const [resultState, setResultState] = useState({});
+    const [sortBy, setSortBy] = useState("score");
+
     const columnToDecideSentiment = "vote_balanced";
     const columnToRenderParagraph = "FORMATTED"; //must be used for bolding
 
-    const [resultState, setResultState] = useState({});
-    const [sortBy, setSortBy] = useState("score")
+    const sortOptions = [
+        { value: "score", label: "Relevance" },
+        { value: "sentNeg", label: "Risk, Relevance" },
+        { value: "sentPos", label: "Mitigation, Relevance" }
+    ]
 
 
     /**
@@ -72,14 +80,11 @@ function Results ({filterState, ...rest}) {
      * is changed from within filters.js
      */
     useEffect(() => {
-        if(!filterState.company || !filterState.source.length) return;
-        if(!filterState.source.length) {
-            setResultState(Object.create({}));
-            return;
-        }
+        if(company===undefined || source==='none' || source===undefined) return;
 
-        const formatURL = (param) =>  
-            `../Formatted_Threshold/formatted_${filterState.company}_${filterState.source[0]}`;
+        const PUBLIC_URL = process.env.PUBLIC_URL;
+        const formatURL = () =>  
+            `${PUBLIC_URL}/Formatted_Threshold/formatted_${company}_${source}`;
 
         const fetchCsv = async(url) => await (await fetch(url)).text();
         const getCsvData = async(url) => Papa.parse(
@@ -88,17 +93,16 @@ function Results ({filterState, ...rest}) {
                 complete: (res) => res.data
             }); 
 
-        const urlPrefix = formatURL(filterState);
-
+        const urlPrefix = formatURL();
         //const formatData = (df) => selectTopNBySentiment(TOPN, calculateOverallSentiment(df));
         const fetchData = async(segment) => await getCsvData(`${urlPrefix}_${segment}.csv`);
 
-        const fetchAllSourceData = (segment) => {
-            return filterState.source.map(async(src) => {
-                const url  = `../Formatted_Threshold/formatted_${filterState.company}_${src}_${segment}.csv`;
-                return await getCsvData(url);
-            });
-        };
+        // const fetchAllSourceData = (segment) => {
+        //     return filterState.source.map(async(src) => {
+        //         const url  = `../Formatted_Threshold/formatted_${companyParam}_${src}_${segment}.csv`;
+        //         return await getCsvData(url);
+        //     });
+        // };
 
 
         // Promise.all([fetchAllSourceData('E'), fetchAllSourceData('S'), fetchAllSourceData('G')])
@@ -121,7 +125,7 @@ function Results ({filterState, ...rest}) {
                     governance: results[2]
                 }))
             });
-    }, [filterState]);
+    }, [company, source]);
 
     
     const WrapParagraph = (props) => {
@@ -135,16 +139,8 @@ function Results ({filterState, ...rest}) {
         return <ParagraphComponent props={sendProps}/>
     }
 
-    const onChange = (value, action) => {
-        console.log(value.value)
-        setSortBy(value.value)
-    }
+    const onChange = (value, action) => setSortBy(value.value)
 
-    const sortOptions = [
-        { value: "score", label: "Relevance" },
-        { value: "sentNeg", label: "Risk, Relevance" },
-        { value: "sentPos", label: "Mitigation, Relevance" }
-    ]
 
     const SelectComponent = () => {
         return <Select  className="filter-dropdown sort"
@@ -152,6 +148,7 @@ function Results ({filterState, ...rest}) {
                         isSearchable={false}
                         onChange={onChange}
                         defaultValue={sortOptions.filter(op => op.value===sortBy)[0]}
+                        styles={params.customFilterStyle}
                 />
     }
 
@@ -181,6 +178,13 @@ function Results ({filterState, ...rest}) {
                     </div>
                 </div>
             </div>
+            <div className="description">
+          <span className="bold">Bold</span> sentences are most relevant to the category. 
+          * The number in [r.number] shows relevancy to the topic (1 being most relevant).
+          * <span className='negative'>Red: ESG risk </span> 
+          * <span className='positive'>Green: ESG mitigation </span> 
+          * Black: Relevant to ESG but no direction regarding ESG risks/mitigation.
+        </div>
         </div>
     );
 };

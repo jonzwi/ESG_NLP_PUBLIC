@@ -3,6 +3,8 @@ import '../App.css';
 import { useEffect, useState } from 'react';
 import Select from 'react-select';
 
+import { Link } from 'react-router-dom';
+
 import { Buffer } from 'buffer';
 
 function LandingPage({params}) {
@@ -14,20 +16,12 @@ function LandingPage({params}) {
     const [selectedOption, setSelectedOption] = useState(undefined);
     const [showApiResults, setShowApiResults] = useState(0);
 
-    const handleNav = () => {
-        let newStateObj = params.appState;
-        newStateObj.company = selectedOption;
-        newStateObj.source = []
-        params.appSetState(Object.create(newStateObj));
-        params.setScreen('topN');
-    }
-
 
     useEffect(() => {
         const today = new Date();
         const month = String(today.getMonth() + 1).padStart(2, '0');
         const year = today.getFullYear();
-        const months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         setDateString(`${months[month-1]} ${year}`)
     },[])
 
@@ -50,6 +44,7 @@ function LandingPage({params}) {
                         onChange={onChange}
                         defaultValue={selectedOption}
                         placeholder="Select Company..."
+                        styles={params.customLandingStyle}
                 />
     }
 
@@ -64,7 +59,9 @@ function LandingPage({params}) {
                     <div className={showApiResults ? "text-landing showApi show" : "text-landing noShowApi hide"}>
                         <div className='fadeIn'>MSCI Score: {(Math.random()*100).toFixed(2)}</div>
                         <div className='fadeIn'>Arabesque Score: {(Math.random()*100).toFixed(2)}</div>
-                        <div className="btn-landing shadow fadeIn" onClick={handleNav}>NLP Deep Dive</div>
+                        <Link to={`topresults/${selectedOption.value}`} className="link">
+                            <div className="btn-landing shadow fadeIn">NLP Deep Dive</div>
+                        </Link>
                     </div>
                 :   <div className={showApiResults ? "text-landing noShowApi show" : "text-landing showApi hide"}/>
                 }
