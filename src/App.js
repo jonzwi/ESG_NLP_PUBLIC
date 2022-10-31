@@ -98,12 +98,10 @@ function App() {
   };
 
 
-  //React Router
-
   const params = {
     options: filterOptions,
     customFilterStyle: filterPageCustomStyles,
-    //customLandingStyle: landingPageCustomStyles
+    customLandingStyle: landingPageCustomStyles
   }
 
   return (

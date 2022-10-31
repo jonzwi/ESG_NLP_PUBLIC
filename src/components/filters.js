@@ -60,7 +60,11 @@ function Filters ({params}) {
 
     return (
         <div className="detail-page fadeIn">
-            <div className="detail-title">Detailed ESG Related Insights</div>
+            <Link to={`..`} className="link">
+                
+            <div className="detail-title"> ESG Related Insights </div>
+            </Link>
+
             <div className="filter-wrap">
                 <div className="selectables">
                     <div className="filter">

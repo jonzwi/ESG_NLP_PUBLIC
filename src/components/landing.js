@@ -44,7 +44,7 @@ function LandingPage({params}) {
                         onChange={onChange}
                         defaultValue={selectedOption}
                         placeholder="Select Company..."
-                        styles={params.customLandingStyle}
+                       // styles={params.customLandingStyle}
                 />
     }
 
