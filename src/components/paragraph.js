@@ -1,6 +1,6 @@
 import '../App.css';
 
-import parse from "html-react-parser";
+import purify from 'dompurify';
 
 function ParagraphComponent({props}){
     
@@ -38,15 +38,6 @@ function ParagraphComponent({props}){
         return arr.sort((a, b) => 
             valMapping[b[getColumnIndx(props.sentimentColumn)]] - 
             valMapping[a[getColumnIndx(props.sentimentColumn)]])
-    }
-        
-    /**
-     * 
-     * @param {object} props 
-     * @returns JSX Component for each paragraph in the input array
-     */
-    const testObjs = (html) => {
-        return parse(html)
     }
 
     const sentimentCount = {
@@ -95,7 +86,7 @@ function ParagraphComponent({props}){
                         sentimentClass==='negative' ? "Risk" : 
                             "Neutral"}
                     </div>
-                    {testObjs(lineToRender)}
+                    <div dangerouslySetInnerHTML={{__html:purify.sanitize(lineToRender)}} />
                 </div>
             );
         }

@@ -54,7 +54,7 @@ function TopNResults({params}) {
     const fetchAllSourceData = (segment) => {
         return sources.map(async(src) => {
             const PUBLIC_URL = process.env.PUBLIC_URL;
-            const url  = `${PUBLIC_URL}/Formatted_Threshold/formatted_${companyParam}_${src}_${segment}.csv`;
+            const url  = `${PUBLIC_URL}/data/Formatted_Threshold/formatted_${companyParam}_${src}_${segment}.csv`;
             return await getCsvData(url);
         });
     };

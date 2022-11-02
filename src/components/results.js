@@ -48,7 +48,7 @@ function Results ({params}) {
 
         const PUBLIC_URL = process.env.PUBLIC_URL;
         const formatURL = () =>  
-            `${PUBLIC_URL}/Formatted_Threshold/formatted_${company}_${source}`;
+            `${PUBLIC_URL}/data/Formatted_Threshold/formatted_${company}_${source}`;
 
         const fetchCsv = async(url) => await (await fetch(url)).text();
         const getCsvData = async(url) => Papa.parse(

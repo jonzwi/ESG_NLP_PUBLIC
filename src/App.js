@@ -2,7 +2,6 @@ import './App.css';
 
 import { 
   BrowserRouter,
-  HashRouter,
   Routes,
   Route
 } from 'react-router-dom';
