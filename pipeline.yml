@@ -3,7 +3,7 @@ trigger:
   - master
 # build environment - OS
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'local'
 steps:
   # build environment - Node
   - task: NodeTool@0
