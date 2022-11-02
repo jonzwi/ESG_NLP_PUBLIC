@@ -2,12 +2,12 @@ import './App.css';
 
 import { 
   BrowserRouter,
+  HashRouter,
   Routes,
   Route
 } from 'react-router-dom';
  
 import Filters from './components/filters';
-import Results from './components/results';
 import LandingPage from './components/landing';
 import TopNResults from './components/topnresults';
 
@@ -104,9 +104,10 @@ function App() {
     customLandingStyle: landingPageCustomStyles
   }
 
+  //Use HashRouter for gh-pages, BrowserRouter for other cases
   return (
     <div className="App">
-      <BrowserRouter>
+      <BrowserRouter basename={process.env.PUBLIC_URL}>
         <Routes>
           <Route path="/" element={<LandingPage params={params}/>}/>
           <Route path="/topresults/:companyName" element={<TopNResults params={params}/>}/>

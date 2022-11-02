@@ -27,42 +27,6 @@ function Results ({params}) {
 
 
     /**
-     * Filters an array of results (df) by topN entries by score
-     * for each sentiment (positive, neutral, negative)
-     * 
-     * IMPORTANT: Not used with filtered csv inputs
-     * 
-     * @param {number} n 
-     * @param {array} df 
-     * @returns array leanDf of filtered entries
-     */
-    const selectTopNBySentiment = (n, df) => {
-        let [countPos, countNeut, countNeg] = [n, n, n];
-        let i=0, leanDf = [];
-        const len = df[0].length-1;
-        while(countPos>0 && i<df.length) {
-            if(i===0) {
-                leanDf.push(df[i]);
-            }
-            if(df[i][len]==='positive' && countPos){
-                leanDf.push(df[i]);
-                countPos--;
-            }
-            else if(df[i][len]==='negative' && countNeg){
-                leanDf.push(df[i]);
-                countNeg--;
-            }
-            else if(df[i][len]==='neutral' && countNeut){
-                leanDf.push(df[i]);
-                countNeut--;
-            }
-            i++;
-        };
-        return leanDf;
-    };
-
-
-    /**
      * Populates a Mapping of the column header name to the array index for results
      * @param {array} inputArr 
      * @returns 
@@ -247,4 +211,40 @@ export default Results;
         //     });
         //     return df;
         // }
+
+    //      /**
+    //  * Filters an array of results (df) by topN entries by score
+    //  * for each sentiment (positive, neutral, negative)
+    //  * 
+    //  * IMPORTANT: Not used with filtered csv inputs
+    //  * 
+    //  * @param {number} n 
+    //  * @param {array} df 
+    //  * @returns array leanDf of filtered entries
+    //  */
+    // const selectTopNBySentiment = (n, df) => {
+    //     let [countPos, countNeut, countNeg] = [n, n, n];
+    //     let i=0, leanDf = [];
+    //     const len = df[0].length-1;
+    //     while(countPos>0 && i<df.length) {
+    //         if(i===0) {
+    //             leanDf.push(df[i]);
+    //         }
+    //         if(df[i][len]==='positive' && countPos){
+    //             leanDf.push(df[i]);
+    //             countPos--;
+    //         }
+    //         else if(df[i][len]==='negative' && countNeg){
+    //             leanDf.push(df[i]);
+    //             countNeg--;
+    //         }
+    //         else if(df[i][len]==='neutral' && countNeut){
+    //             leanDf.push(df[i]);
+    //             countNeut--;
+    //         }
+    //         i++;
+    //     };
+    //     return leanDf;
+    // };
+
 
