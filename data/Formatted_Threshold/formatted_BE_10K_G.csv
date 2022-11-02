@@ -1,0 +1,1 @@
+,QUERY,MATCH_SCORE,PRG_NUM,PRG_TXT,filtered,FORMATTED,G_finBERT_ntl_pos_neg,G_finBERT_maxSentiment,G_fineTuned_ntl_pos_neg,G_fineTuned_maxSentiment,G_twitter_ntl_pos_neg,G_twitter_maxSentiment,vote_balanced,vote_extreme,vote_annuled
