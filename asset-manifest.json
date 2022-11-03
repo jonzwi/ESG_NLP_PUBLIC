@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/ESGNLP/static/css/main.61264143.css",
-    "main.js": "/ESGNLP/static/js/main.b24959a4.js",
+    "main.js": "/ESGNLP/static/js/main.20485131.js",
     "static/js/787.49758216.chunk.js": "/ESGNLP/static/js/787.49758216.chunk.js",
     "static/media/capgemini-logo.png": "/ESGNLP/static/media/capgemini-logo.8cd2f2d5378833df4a20.png",
     "static/media/LandingBackground.jpg": "/ESGNLP/static/media/LandingBackground.08fa259e587298f22d0c.jpg",
     "index.html": "/ESGNLP/index.html",
     "main.61264143.css.map": "/ESGNLP/static/css/main.61264143.css.map",
-    "main.b24959a4.js.map": "/ESGNLP/static/js/main.b24959a4.js.map",
+    "main.20485131.js.map": "/ESGNLP/static/js/main.20485131.js.map",
     "787.49758216.chunk.js.map": "/ESGNLP/static/js/787.49758216.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.61264143.css",
-    "static/js/main.b24959a4.js"
+    "static/js/main.20485131.js"
   ]
 }
